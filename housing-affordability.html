@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NZ Housing Affordability Calculator | Your Money Blueprint</title>
+<meta name="description" content="How affordable are houses in your region? Median house prices against median household incomes in 10 NZ regions since 2005: price to income, repayments and deposit.">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="loading" id="loading">Loading housing data&hellip;</div>
+  <div id="app" hidden style="display:grid;gap:22px">
+  <div style="display:grid;gap:6px">
+    <p class="sub">How the median house compares with the median household income in 10 regions since 2005, and what you'd need to buy there.</p>
+  </div>
+
+  <div class="card panel">
+    <div class="section-label">Your view</div>
+    <div class="controls">
+      <div class="field"><span>Region</span><select id="region"></select></div>
+      <div class="field"><span>Years</span>
+        <div class="range"><select id="from" aria-label="From"></select><span>to</span><select id="to" aria-label="To"></select></div>
+        <div class="hint">At least 3 years apart. Averages, highs and lows use these years.</div>
+      </div>
+      <div class="field"><span>Measure</span>
+        <div class="seg" id="measure"><button data-v="mult">House price to income</button><button data-v="pay">Repayments</button><button data-v="dep">Deposit</button></div>
+      </div>
+    </div>
+    <div class="section-label">Assumptions</div>
+    <div class="controls">
+      <div class="field"><span>Interest rate</span>
+        <div class="seg" id="rates"><button data-v="special">Special rates</button><button data-v="standard">Standard rates</button></div>
+        <div class="hint" id="rateHint"></div>
+      </div>
+      <div class="field"><span>Deposit (share of price)</span>
+        <div class="seg" id="dep"><button data-v="0.1">10%</button><button data-v="0.2">20%</button></div>
+        <div class="hint">The loan, and so the repayments, is the rest of the price.</div>
+      </div>
+      <div class="field"><span>Loan term</span>
+        <div class="seg" id="term"><button data-v="25">25 years</button><button data-v="30">30 years</button></div>
+      </div>
+      <div class="field"><span>Income</span>
+        <div class="seg" id="smooth"><button data-v="0">Each year</button><button data-v="1">3-year average</button></div>
+        <div class="hint">Median household income before tax. Retiree-only households aren't counted, since few of them are buying. Smaller regions jump around from survey to survey, and the average evens that out.</div>
+      </div>
+    </div>
+  <div class="toolbar"><button class="share" id="share" type="button">Copy link to these settings</button></div>
+    <div class="share-out" id="shareOut" hidden></div>
+  </div>
+
+  <div class="card">
+    <p class="headline" id="headline"></p>
+    <p class="assume" id="assume"></p>
+    <div class="tiles" id="tiles"></div>
+  </div>
+
+  <div class="card">
+    <div class="chart-head">
+      <div style="display:grid;gap:4px"><h2 id="chartTitle"></h2><p class="sub" id="chartSub"></p></div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="chart" id="chart"></div>
+    <div class="slider" id="whatifRow">
+      <label for="whatif">What if every year had the same rate?</label>
+      <input type="range" id="whatif" min="0" max="9" step="0.25" value="0">
+      <output id="whatifOut">Off</output>
+      <span class="hint" style="max-width:none">Separates the effect of house prices from the effect of interest rates.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="chart-head">
+      <div style="display:grid;gap:4px"><h2 id="rankTitle"></h2><p class="sub">Tap a region to see it on the chart.</p></div>
+      <div class="field"><span>Year</span><select id="rankYear"></select></div>
+    </div>
+    <div class="rank" id="rank"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:grid;gap:4px"><h2>Your figures</h2><p class="sub">Enter your household income before tax and the price you're looking at, to see where you sit.</p></div>
+    <div class="controls">
+      <div class="field"><span>Household income before tax</span><div class="money"><input type="text" inputmode="numeric" id="yInc" value="120,000"></div><div class="hint">Everyone buying together, per year.</div></div>
+      <div class="field"><span>House price</span><div class="money"><input type="text" inputmode="numeric" id="yPrice" value="750,000"></div></div>
+      <div class="field"><span>Your interest rate</span><div style="display:flex;align-items:center;gap:6px"><input type="number" id="yRate" step="0.05" min="0" max="20" style="width:84px"><span style="color:var(--ink-3)">%</span></div><div class="hint">Starts at the latest special 1-year rate.</div></div>
+    </div>
+    <div class="tiles" id="yTiles"></div>
+    <p class="compare" id="yCompare"></p>
+  </div>
+
+  <div class="card">
+    <details class="tbl">
+      <summary id="tblSummary">All regions, every year</summary>
+      <div class="tablewrap" style="margin-top:12px"><table id="tbl"></table></div>
+    </details>
+  </div>
+
+  <div class="notes">
+    <h3>About these numbers</h3>
+    <ul>
+      <li id="dataNote"></li>
+      <li><b>House prices:</b> REINZ median sale price for August each year, for today's regional council areas. Figures before 2017 are from interest.co.nz's REINZ series.</li>
+      <li><b>Incomes:</b> Stats NZ median weekly household income from all sources before tax, June year, times 52 (Household Labour Force Survey). It covers households with at least one person aged 18 to 64, so retiree-only households are left out. That suits a measure about buying a home, but it runs higher than Stats NZ's all-household figure.</li>
+      <li><b>Interest rates:</b> Reserve Bank average 1-year fixed rate for new borrowers, August. Special rates (the discounted rates most buyers get) are only recorded from 2017. Standard rates go back to 2005 but are higher than most people paid.</li>
+      <li><b>Deposit and loan:</b> the deposit is 20% of the price unless you choose 10%. Repayments are principal and interest on the rest of the price over 30 years (or 25), compared with income before tax so years stay comparable.</li>
+      <li><b>Averages</b> are simple averages of the years you've chosen. For repayments on special rates they start in 2017, when the special rate figures begin.</li>
+      <li>Six smaller regions aren't shown because their data is too thin: Gisborne, Hawke's Bay, Nelson, Tasman, Marlborough and the West Coast. The national line covers all of New Zealand.</li>
+      <li>Want to work out your own budget? Try the <a href="https://www.yourmoneyblueprint.co.nz/how-much-house-can-i-afford" target="_top">how much house can I afford calculator</a>.</li>
+      <li>This is general information about the past, not personalised financial advice.</li>
+    </ul>
+  </div>
+  </div>
+</div>
+<script src="assets/housing.js"></script>
+</body>
+</html>

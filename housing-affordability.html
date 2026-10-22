@@ -6,7 +6,7 @@
 <title>NZ Housing Affordability Calculator | Your Money Blueprint</title>
 <meta name="description" content="How affordable are houses in your region? Median house prices against median household incomes in 10 NZ regions since 2005: price to income, repayments and deposit.">
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=3">
 </head>
 <body>
 <div class="wrap">
@@ -58,6 +58,7 @@
     <p class="headline" id="headline"></p>
     <p class="assume" id="assume"></p>
     <div class="tiles" id="tiles"></div>
+    <p class="sub">No single measure tells the whole story. The house price can be high while repayments are low (or the other way round) because of interest rates, so read the three together. These figures are for the median house; many buyers, especially first home buyers, pay less. Use Your figures below to check your own price.</p>
   </div>
 
   <div class="card">
@@ -83,7 +84,7 @@
   </div>
 
   <div class="card">
-    <div style="display:grid;gap:4px"><h2>Your figures</h2><p class="sub">Enter your household income before tax and the price you're looking at, to see where you sit.</p></div>
+    <div style="display:grid;gap:4px"><h2 id="yourFigures">Your figures</h2><p class="sub">Enter your household income before tax and the price you're looking at, to see where you sit.</p></div>
     <div class="controls">
       <div class="field"><span>Household income before tax</span><div class="money"><input type="text" inputmode="numeric" id="yInc" value="120,000"></div><div class="hint">Everyone buying together, per year.</div></div>
       <div class="field"><span>House price</span><div class="money"><input type="text" inputmode="numeric" id="yPrice" value="750,000"></div></div>
@@ -118,6 +119,6 @@
   </div>
   </div>
 </div>
-<script src="assets/housing.js"></script>
+<script src="assets/housing.js?v=3"></script>
 </body>
 </html>
